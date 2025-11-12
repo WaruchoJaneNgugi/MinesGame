@@ -19,8 +19,6 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [hoveredCell, setHoveredCell] = useState<number | null>(null);
     const [imagesLoaded, setImagesLoaded] = useState(false);
-
-    // Preload images
     const gemImageRef = useRef<HTMLImageElement | null>(null);
     const bombImageRef = useRef<HTMLImageElement | null>(null);
 
