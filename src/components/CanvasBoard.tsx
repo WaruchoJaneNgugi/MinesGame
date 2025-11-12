@@ -158,8 +158,10 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
                     cellX + cellSize,
                     cellY + cellSize
                 );
-                gradient.addColorStop(0, '#0e0c1d');
-                gradient.addColorStop(1, '#46060c');
+                gradient.addColorStop(0, '#3b0309');
+                gradient.addColorStop(0.75, '#260000');
+                gradient.addColorStop(1, '#3b0309');
+
                 ctx.fillStyle = gradient;
                 ctx.fillRect(cellX, cellY, cellSize, cellSize);
 
@@ -185,7 +187,7 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
                     cellY + cellSize
                 );
                 gradient.addColorStop(0, '#292d40');
-                gradient.addColorStop(0.7, '#25273b');
+                gradient.addColorStop(0.7, '#141621');
                 gradient.addColorStop(1, '#1e2032');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(cellX, cellY, cellSize, cellSize);

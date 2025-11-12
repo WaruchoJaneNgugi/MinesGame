@@ -3,6 +3,7 @@ import CanvasBoard from './CanvasBoard';
 import GameControls from './GameControls';
 import '../styles/mines.css';
 import type {Cell, GameState} from "../types/game.ts";
+import GameHeader from "./GameHeader.tsx";
 
 const GRID_SIZE = 5;
 
@@ -21,6 +22,7 @@ const INITIAL_STATE: GameState = {
 const MinesGame: React.FC = () => {
     const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
     const [showAllCells, setShowAllCells] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
 
     const getBombsCount = useCallback((level: string): number => {
         switch (level) {
@@ -231,15 +233,20 @@ const MinesGame: React.FC = () => {
 
     return (
         <div className="mines-game">
-            <div className="game-header">
-                <div className="title-section">
-                    <h1 className="game-title">MINES</h1>
-                    <div className="balance-section">
-                        <span className="balance-label">BALANCE</span>
-                        <span className="balance-amount">{gameState.balance.toFixed(2)}</span>
-                    </div>
-                </div>
-            </div>
+            {/*<div className="game-header">*/}
+            {/*    <div className="title-section">*/}
+            {/*        <h1 className="game-title">MINES</h1>*/}
+            {/*        <div className="balance-section">*/}
+            {/*            <span className="balance-label">BALANCE</span>*/}
+            {/*            <span className="balance-amount">{gameState.balance.toFixed(2)}</span>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
+            <GameHeader
+                balance={gameState.balance}
+                onMuteToggle={() => setIsMuted(!isMuted)}
+                isMuted={isMuted}
+            />
 
             <div className="right-panel">
                 <CanvasBoard
