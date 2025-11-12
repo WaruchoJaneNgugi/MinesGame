@@ -20,8 +20,7 @@ const GameControls: React.FC<GameControlsProps> = ({
                                                        onChangeBet,
                                                        onAdjustBet
                                                    }) => {
-    const betAmounts = [20, 50, 100, 500, 1000];
-
+    const betAmounts = [10, 50, 100,250, 500];
     return (
         <div className="game-controls">
             <div className="control-section">
@@ -29,32 +28,34 @@ const GameControls: React.FC<GameControlsProps> = ({
                 <div className="main-bet-amounts">
                     <div className="bet-amount-selector">
                         {betAmounts.map(amount => (
-                            <button
+                            <div
                                 key={amount}
                                 className={`bet-amount-btn ${gameState.betAmount === amount ? 'active' : ''}`}
                                 onClick={() => onChangeBet(amount)}
+                                title={`Bet $${amount}`}
                             >
                                 {amount}
-                            </button>
+                            </div>
                         ))}
                     </div>
                     <div className="bet-adjuster">
-                        <button
+                        <div
                             className="bet-adjust-btn"
                             onClick={() => onAdjustBet(false)}
+                            title="Decrease bet"
                         >
                             -
-                        </button>
-                        <span className="current-bet">{gameState.betAmount}</span>
-                        <button
+                        </div>
+                        <div className="current-bet">{gameState.betAmount}</div>
+                        <div
                             className="bet-adjust-btn"
                             onClick={() => onAdjustBet(true)}
+                            title="Increase bet"
                         >
                             +
-                        </button>
+                        </div>
                     </div>
                 </div>
-
             </div>
 
             <div className="control-section">
@@ -80,45 +81,42 @@ const GameControls: React.FC<GameControlsProps> = ({
                         </div>
                     )}
                 </div>
-
             </div>
-
 
 
             <div className="action-buttons">
                 {{
                     idle: (
-                        <button
+                        <div
                             className="action-btn start-btn"
                             onClick={onStart}
-                            disabled={gameState.balance < gameState.betAmount}
                         >
                             START GAME
-                        </button>
+                        </div>
                     ),
                     playing: (
-                        <button
+                        <div
                             className="action-btn cashout-btn"
                             onClick={onCashOut}
                         >
                             CASH OUT Ksh{(gameState.betAmount * gameState.multiplier).toFixed(2)}
-                        </button>
+                        </div>
                     ),
                     win: (
-                        <button
+                        <div
                             className="action-btn reset-btn"
                             onClick={onReset}
                         >
                             PLAY AGAIN
-                        </button>
+                        </div>
                     ),
                     lose: (
-                        <button
+                        <div
                             className="action-btn reset-btn"
                             onClick={onReset}
                         >
                             PLAY AGAIN
-                        </button>
+                        </div>
                     )
                 }[gameState.gameStatus]}
             </div>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import CanvasBoard from './CanvasBoard';
 import GameControls from './GameControls';
 import '../styles/mines.css';
@@ -12,22 +12,26 @@ const INITIAL_STATE: GameState = {
     revealed: 0,
     gameStatus: 'idle',
     level: 'easy',
-    betAmount: 20,
+    betAmount: 10,
     multiplier: 1.00,
     totalWinnings: 0,
-    balance: 1000
+    balance: 1000 // Changed from 960 to 1000
 };
 
 const MinesGame: React.FC = () => {
     const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
-    const [showAllCells, setShowAllCells] = useState(false); // New state for cashout reveal
+    const [showAllCells, setShowAllCells] = useState(false);
 
     const getBombsCount = useCallback((level: string): number => {
         switch (level) {
-            case 'easy': return 3;
-            case 'medium': return 5;
-            case 'hard': return 8;
-            default: return 3;
+            case 'easy':
+                return 3;
+            case 'medium':
+                return 5;
+            case 'hard':
+                return 8;
+            default:
+                return 3;
         }
     }, []);
 
@@ -74,10 +78,9 @@ const MinesGame: React.FC = () => {
             revealed: 0,
             multiplier: 1.00,
             totalWinnings: 0,
-            balance: prev.balance - prev.betAmount
+            balance: prev.balance - prev.betAmount // Deduct bet amount from balance
         }));
 
-        // Ensure cells are hidden when starting new game
         setShowAllCells(false);
     }, [gameState.balance, gameState.betAmount, initializeBoard]);
 
@@ -94,7 +97,7 @@ const MinesGame: React.FC = () => {
     }, [initializeBoard]);
 
     const revealCell = useCallback((cellIndex: number) => {
-        if (gameState.gameStatus !== 'playing' || showAllCells) return; // Don't allow clicks during reveal phase
+        if (gameState.gameStatus !== 'playing' || showAllCells) return;
 
         setGameState(prev => {
             const newBoard = [...prev.board];
@@ -102,7 +105,6 @@ const MinesGame: React.FC = () => {
 
             if (cell.isRevealed || cell.isFlagged) return prev;
 
-            // Reveal the cell
             cell.isRevealed = true;
             const newRevealed = prev.revealed + 1;
 
@@ -112,38 +114,29 @@ const MinesGame: React.FC = () => {
             let newBalance = prev.balance;
 
             if (cell.isBomb) {
-                // Game over - hit a bomb
                 newGameStatus = 'lose';
                 newTotalWinnings = 0;
-
-                // Show all cells temporarily when bomb is clicked
                 setShowAllCells(true);
 
-                // After 2 seconds, reset to idle state with fresh board
                 setTimeout(() => {
                     resetToIdleState();
                 }, 2000);
 
             } else {
-                // Safe cell revealed
                 const bombsCount = getBombsCount(prev.level);
                 const safeCells = (GRID_SIZE * GRID_SIZE) - bombsCount;
                 const risk = newRevealed / safeCells;
 
-                // Calculate multiplier based on risk and level
                 const baseMultiplier = prev.level === 'easy' ? 1.2 : prev.level === 'medium' ? 1.5 : 2.0;
                 newMultiplier = Number((baseMultiplier * (1 + risk)).toFixed(2));
 
-                // Check for win
                 if (newRevealed === safeCells) {
                     newGameStatus = 'win';
                     newTotalWinnings = prev.betAmount * newMultiplier;
                     newBalance = prev.balance + newTotalWinnings;
 
-                    // Show all cells temporarily when player wins
                     setShowAllCells(true);
 
-                    // After 2 seconds, reset to idle state with fresh board
                     setTimeout(() => {
                         resetToIdleState();
                     }, 2000);
@@ -167,10 +160,8 @@ const MinesGame: React.FC = () => {
 
         const winnings = gameState.betAmount * gameState.multiplier;
 
-        // Show all cells temporarily
         setShowAllCells(true);
 
-        // After 2 seconds, reset to idle state with fresh board
         setTimeout(() => {
             setGameState(prev => {
                 const newBoard = initializeBoard();
@@ -212,19 +203,18 @@ const MinesGame: React.FC = () => {
 
     const adjustBetAmount = useCallback((increment: boolean) => {
         setGameState(prev => {
-            const betAmounts = [20, 50, 100, 500, 1000];
-            const currentIndex = betAmounts.indexOf(prev.betAmount);
-            let newIndex;
+            const currentBet = prev.betAmount;
+            let newBetAmount;
 
             if (increment) {
-                newIndex = Math.min(currentIndex + 1, betAmounts.length - 1);
+                newBetAmount = currentBet + 10;
             } else {
-                newIndex = Math.max(currentIndex - 1, 0);
+                newBetAmount = Math.max(10, currentBet - 10); // Minimum bet is 10
             }
 
             return {
                 ...prev,
-                betAmount: betAmounts[newIndex]
+                betAmount: newBetAmount
             };
         });
     }, []);
@@ -234,10 +224,9 @@ const MinesGame: React.FC = () => {
         setShowAllCells(false);
     }, []);
 
-    // Initialize board on mount
     useEffect(() => {
         const newBoard = initializeBoard();
-        setGameState(prev => ({ ...prev, board: newBoard }));
+        setGameState(prev => ({...prev, board: newBoard}));
     }, [initializeBoard]);
 
     return (
@@ -252,26 +241,24 @@ const MinesGame: React.FC = () => {
                 </div>
             </div>
 
-            <div className="game-layout">
-                <div className="right-panel">
-                    <CanvasBoard
-                        board={gameState.board}
-                        onRevealCell={revealCell}
-                        gameStatus={gameState.gameStatus}
-                        showAllCells={showAllCells}
-                    />
-                </div>
-                <div className="left-panel">
-                    <GameControls
-                        gameState={gameState}
-                        onStart={startGame}
-                        onCashOut={cashOut}
-                        onReset={resetGame}
-                        onChangeLevel={changeLevel}
-                        onChangeBet={changeBetAmount}
-                        onAdjustBet={adjustBetAmount}
-                    />
-                </div>
+            <div className="right-panel">
+                <CanvasBoard
+                    board={gameState.board}
+                    onRevealCell={revealCell}
+                    gameStatus={gameState.gameStatus}
+                    showAllCells={showAllCells}
+                />
+            </div>
+            <div className="left-panel">
+                <GameControls
+                    gameState={gameState}
+                    onStart={startGame}
+                    onCashOut={cashOut}
+                    onReset={resetGame}
+                    onChangeLevel={changeLevel}
+                    onChangeBet={changeBetAmount}
+                    onAdjustBet={adjustBetAmount}
+                />
             </div>
         </div>
     );
