@@ -249,7 +249,6 @@ const MinesGame: React.FC = () => {
                     showAllCells={showAllCells}
                 />
             </div>
-            <div className="left-panel">
                 <GameControls
                     gameState={gameState}
                     onStart={startGame}
@@ -259,7 +258,6 @@ const MinesGame: React.FC = () => {
                     onChangeBet={changeBetAmount}
                     onAdjustBet={adjustBetAmount}
                 />
-            </div>
         </div>
     );
 };
