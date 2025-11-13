@@ -183,27 +183,7 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
                     const bombSize = cellSize * 0.7;
                     const bombX = cellX + (cellSize - bombSize) / 2;
                     const bombY = cellY + (cellSize - bombSize) / 2;
-                    if (explosionImageRef.current) {
-                        const sprite = explosionImageRef.current;
-                        const totalFrames = 7; // your sheet has 7 frames
-                        const frameWidth = sprite.width / totalFrames;
-                        const frameHeight = sprite.height;
 
-                        explosions.forEach(explosion => {
-                            const { x, y, frame } = explosion;
-                            const size = cellSize * 1.2; // slightly larger than cell
-                            const frameX = frame * frameWidth;
-
-                            ctx.drawImage(
-                                sprite,
-                                frameX, 0, frameWidth, frameHeight,
-                                x + (cellSize - size) / 2,
-                                y + (cellSize - size) / 2,
-                                size,
-                                size
-                            );
-                        });
-                    }
                     ctx.drawImage(bombImageRef.current, bombX, bombY, bombSize, bombSize);
 
                 } else {
@@ -341,6 +321,31 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
             ctx.stroke();
         }
         ctx.globalAlpha = 1.0;
+// Draw explosions after board cells
+        if (explosionImageRef.current) {
+            const sprite = explosionImageRef.current;
+            const totalFrames = 7;
+            const frameWidth = sprite.width / totalFrames;
+            const frameHeight = sprite.height;
+
+            explosions.forEach(({ x, y, frame }) => {
+                const size = cellSize * 1.2;
+                const frameX = frame * frameWidth;
+
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.globalAlpha = 0.9;
+                ctx.drawImage(
+                    sprite,
+                    frameX, 0, frameWidth, frameHeight,
+                    x + (cellSize - size) / 2,
+                    y + (cellSize - size) / 2,
+                    size,
+                    size
+                );
+                ctx.restore();
+            });
+        }
 
     }, [board, drawCell, gridStartX, gridStartY, totalGridWidth, totalGridHeight, cellSize, hoveredCell, showAllCells]);
     useEffect(() => {
@@ -349,9 +354,9 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
             setExplosions(prev =>
                 prev
                     .map(exp => ({ ...exp, frame: exp.frame + 1 }))
-                    .filter(exp => exp.frame < 7) // remove after last frame
+                    .filter(exp => exp.frame < 6) // remove after last frame
             );
-        }, 80); // 80ms per frame
+        }, 120); // 80ms per frame
 
         return () => clearInterval(interval);
     }, [explosions]);
