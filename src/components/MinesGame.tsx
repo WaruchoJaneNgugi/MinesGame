@@ -4,6 +4,7 @@ import GameControls from './GameControls';
 import '../styles/mines.css';
 import type {Cell, GameState} from "../types/game.ts";
 import GameHeader from "./GameHeader.tsx";
+import {useAudioControl} from "../Hooks/useSound.ts";
 
 const GRID_SIZE = 5;
 
@@ -23,7 +24,7 @@ const MinesGame: React.FC = () => {
     const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
     const [showAllCells, setShowAllCells] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
-
+    const {playSound}=useAudioControl(isMuted,true);
     const getBombsCount = useCallback((level: string): number => {
         switch (level) {
             case 'easy':
@@ -84,7 +85,8 @@ const MinesGame: React.FC = () => {
         }));
 
         setShowAllCells(false);
-    }, [gameState.balance, gameState.betAmount, initializeBoard]);
+        playSound('betClickSnd');
+    }, [gameState.balance, gameState.betAmount, initializeBoard, playSound]);
 
     const resetToIdleState = useCallback(() => {
         const newBoard = initializeBoard();
@@ -119,7 +121,7 @@ const MinesGame: React.FC = () => {
                 newGameStatus = 'lose';
                 newTotalWinnings = 0;
                 setShowAllCells(true);
-
+                playSound('bombClickSnd');
                 setTimeout(() => {
                     resetToIdleState();
                 }, 2000);
@@ -131,7 +133,7 @@ const MinesGame: React.FC = () => {
 
                 const baseMultiplier = prev.level === 'easy' ? 1.2 : prev.level === 'medium' ? 1.5 : 2.0;
                 newMultiplier = Number((baseMultiplier * (1 + risk)).toFixed(2));
-
+                playSound('cellSelectSnd');
                 if (newRevealed === safeCells) {
                     newGameStatus = 'win';
                     newTotalWinnings = prev.betAmount * newMultiplier;
@@ -155,7 +157,7 @@ const MinesGame: React.FC = () => {
                 balance: newBalance
             };
         });
-    }, [gameState.gameStatus, getBombsCount, showAllCells, resetToIdleState]);
+    }, [gameState.gameStatus, showAllCells, playSound, resetToIdleState, getBombsCount]);
 
     const cashOut = useCallback(() => {
         if (gameState.gameStatus !== 'playing' || gameState.revealed === 0) return;
@@ -163,7 +165,7 @@ const MinesGame: React.FC = () => {
         const winnings = gameState.betAmount * gameState.multiplier;
 
         setShowAllCells(true);
-
+        playSound('cashOutClickSnd');
         setTimeout(() => {
             setGameState(prev => {
                 const newBoard = initializeBoard();
@@ -180,7 +182,7 @@ const MinesGame: React.FC = () => {
             setShowAllCells(false);
         }, 2000);
 
-    }, [gameState.gameStatus, gameState.revealed, gameState.betAmount, gameState.multiplier, initializeBoard]);
+    }, [gameState.gameStatus, gameState.revealed, gameState.betAmount, gameState.multiplier, playSound, initializeBoard]);
 
     const changeLevel = useCallback((level: 'easy' | 'medium' | 'hard') => {
         setGameState(prev => {
@@ -194,14 +196,16 @@ const MinesGame: React.FC = () => {
                 multiplier: 1.00
             };
         });
-    }, [getBombsCount, initializeBoard]);
+        playSound('betClickSnd');
+    }, [getBombsCount, initializeBoard, playSound]);
 
     const changeBetAmount = useCallback((amount: number) => {
         setGameState(prev => ({
             ...prev,
             betAmount: amount
         }));
-    }, []);
+        playSound('betClickSnd');
+    }, [playSound]);
 
     const adjustBetAmount = useCallback((increment: boolean) => {
         setGameState(prev => {
@@ -219,12 +223,14 @@ const MinesGame: React.FC = () => {
                 betAmount: newBetAmount
             };
         });
-    }, []);
+        playSound('betClickSnd');
+    }, [playSound]);
 
     const resetGame = useCallback(() => {
         setGameState(INITIAL_STATE);
         setShowAllCells(false);
-    }, []);
+        playSound('betClickSnd');
+    }, [playSound]);
 
     useEffect(() => {
         const newBoard = initializeBoard();

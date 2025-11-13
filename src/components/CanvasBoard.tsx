@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback, useState } from 'react';
 import type { Cell } from "../types/game.ts";
 import RedGem from "../assets/gems/mines-gem-red.png";
 import BombIMG from "../assets/gems/mines-bomb.png";
+import ExplodeEffectSprite from "../assets/sprite/sprite-explosion.png";
 
 interface CanvasBoardProps {
     board: Cell[];
@@ -21,6 +22,8 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const gemImageRef = useRef<HTMLImageElement | null>(null);
     const bombImageRef = useRef<HTMLImageElement | null>(null);
+    const explosionImageRef = useRef<HTMLImageElement | null>(null);
+    const [explosions, setExplosions] = useState<{ x: number; y: number; frame: number }[]>([]);
 
     const GRID_SIZE = 5;
     const CANVAS_SIZE = 800;
@@ -55,7 +58,12 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
         bombImageRef.current.onload = checkAllLoaded;
         bombImageRef.current.onerror = checkAllLoaded;
         bombImageRef.current.src = BombIMG;
+        // Load sprite image
 
+        explosionImageRef.current = new Image();
+        explosionImageRef.current.onload = checkAllLoaded;
+        explosionImageRef.current.onerror = checkAllLoaded;
+        explosionImageRef.current.src = ExplodeEffectSprite;
         // Fallback in case images take too long
         const timeout = setTimeout(() => {
             setImagesLoaded(true);
@@ -101,7 +109,12 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
         if (!clickedCell || clickedCell.isRevealed) return;
 
         onRevealCell(cellIndex);
-    }, [gameStatus, getCellCoordinates, board, onRevealCell, showAllCells]);
+        if (clickedCell.isBomb) {
+            const x = gridStartX + col * (cellSize + GRID_GAP);
+            const y = gridStartY + row * (cellSize + GRID_GAP);
+            setExplosions(prev => [...prev, { x, y, frame: 0 }]);
+        }
+    }, [gameStatus, showAllCells, getCellCoordinates, board, onRevealCell, gridStartX, cellSize, gridStartY]);
 
     const handleMouseMove = useCallback((event: MouseEvent) => {
         const canvas = canvasRef.current;
@@ -170,7 +183,29 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
                     const bombSize = cellSize * 0.7;
                     const bombX = cellX + (cellSize - bombSize) / 2;
                     const bombY = cellY + (cellSize - bombSize) / 2;
+                    if (explosionImageRef.current) {
+                        const sprite = explosionImageRef.current;
+                        const totalFrames = 7; // your sheet has 7 frames
+                        const frameWidth = sprite.width / totalFrames;
+                        const frameHeight = sprite.height;
+
+                        explosions.forEach(explosion => {
+                            const { x, y, frame } = explosion;
+                            const size = cellSize * 1.2; // slightly larger than cell
+                            const frameX = frame * frameWidth;
+
+                            ctx.drawImage(
+                                sprite,
+                                frameX, 0, frameWidth, frameHeight,
+                                x + (cellSize - size) / 2,
+                                y + (cellSize - size) / 2,
+                                size,
+                                size
+                            );
+                        });
+                    }
                     ctx.drawImage(bombImageRef.current, bombX, bombY, bombSize, bombSize);
+
                 } else {
                     // Fallback drawn bomb
                     ctx.fillStyle = '#2a0b0e';
@@ -255,12 +290,14 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
             ctx.fillText('?', cellX + cellSize / 2, cellY + cellSize / 2);
             ctx.shadowBlur = 0;
         }
+// Draw active explosions
+
 
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
         ctx.shadowBlur = 8;
         ctx.shadowOffsetX = 4;
         ctx.shadowOffsetY = 4;
-    }, [cellSize, gridStartX, gridStartY, imagesLoaded]);
+    }, [cellSize, explosions, gridStartX, gridStartY, imagesLoaded]);
 
     const drawBoard = useCallback(() => {
         const canvas = canvasRef.current;
@@ -306,6 +343,18 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
         ctx.globalAlpha = 1.0;
 
     }, [board, drawCell, gridStartX, gridStartY, totalGridWidth, totalGridHeight, cellSize, hoveredCell, showAllCells]);
+    useEffect(() => {
+        if (explosions.length === 0) return;
+        const interval = setInterval(() => {
+            setExplosions(prev =>
+                prev
+                    .map(exp => ({ ...exp, frame: exp.frame + 1 }))
+                    .filter(exp => exp.frame < 7) // remove after last frame
+            );
+        }, 80); // 80ms per frame
+
+        return () => clearInterval(interval);
+    }, [explosions]);
 
     // Event listener setup
     useEffect(() => {

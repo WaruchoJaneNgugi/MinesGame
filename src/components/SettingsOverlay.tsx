@@ -7,16 +7,14 @@ import {AudioSettings} from "./AudioSettings.tsx";
 
 interface SettingsOverlayProps {
     onClose: () => void;
+    isMuted:boolean;
+    onMuteToggle: () => void;
+
 }
 
-export const SettingsOverlay: FC<SettingsOverlayProps> = ({ onClose }) => {
+export const SettingsOverlay: FC<SettingsOverlayProps> = ({ onClose,isMuted,onMuteToggle }) => {
     const [activeTab, setActiveTab] = useState<'how-to-play' | 'bet-history' | 'audio'>('how-to-play');
-    const [isMuted, setIsMuted] = useState(false);
 
-    const handleMuteToggle = () => {
-        setIsMuted(!isMuted);
-        // You can add your audio logic here
-    };
 
     return (
         <div className="settings-overlay">
@@ -61,7 +59,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = ({ onClose }) => {
                     {activeTab === 'audio' && (
                         <AudioSettings
                             isMuted={isMuted}
-                            onMuteToggle={handleMuteToggle}
+                            onMuteToggle={onMuteToggle}
                         />
                     )}
                 </div>

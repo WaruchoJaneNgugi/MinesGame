@@ -45,6 +45,8 @@ const GameHeader: FC<GameHeaderProps> = ({ balance, onMuteToggle, isMuted }) => 
             {/* Settings Overlay */}
             {showSettings && (
                 <SettingsOverlay
+                    isMuted={isMuted}
+                    onMuteToggle={onMuteToggle}
                     onClose={() => setShowSettings(false)}
                 />
             )}
