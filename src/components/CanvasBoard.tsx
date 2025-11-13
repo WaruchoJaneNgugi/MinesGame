@@ -176,7 +176,6 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
                 gradient.addColorStop(0, '#3b0309');
                 gradient.addColorStop(0.75, '#260000');
                 gradient.addColorStop(1, '#3b0309');
-
                 ctx.fillStyle = gradient;
                 ctx.fillRect(cellX, cellY, cellSize, cellSize);
 
