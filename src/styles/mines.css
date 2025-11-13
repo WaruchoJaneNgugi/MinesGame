@@ -3,12 +3,13 @@
     --secondary-bg: #1a1f2e;
     --accent-green: #00ff88;
     --accent-red: #ff4757;
-    --accent-blue: #2d87f0;
+    --accent-blue:linear-gradient(to right, #6463f5 0%, #220064 51%, #6600ff 100%);
+    --accent-title-blue: #0051ff;
     --accent-deepgreen: #67ff00;
     --text-primary: #ffffff;
     --text-secondary: #8f9bb3;
     --border-radius: 8px;
-    --transition: all 0.3s ease;
+    --transition: all 0.5s ease;
 }
 
 * {
@@ -46,7 +47,7 @@ body {
 .game-title {
     font-size: 1.2rem;
     font-weight: bold;
-    background: linear-gradient(45deg, var(--accent-green), var(--accent-blue));
+    background: linear-gradient(45deg, var(--accent-green), var(--accent-title-blue));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -232,11 +233,16 @@ canvas {
     font-size: 16px;
     font-weight: bold;
     transition: var(--transition);
+    background-size: 200% auto;
 }
 
 .bet-adjust-btn:hover {
-    background: #1a75e0;
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
 }
+
+
 
 .current-bet {
     font-size: 14px;
@@ -271,7 +277,9 @@ canvas {
 .level-btn.active {
     background: var(--accent-blue);
     color: white;
-    border-color: var(--accent-blue);
+    /*border-color: var(--accent-blue);*/
+    transition: var(--transition);
+    background-size: 200% auto;
 }
 
 .level-btn:hover:not(.active) {
@@ -340,11 +348,14 @@ canvas {
 .cashout-btn {
     background: var(--accent-blue);
     color: white;
+    transition: var(--transition);
+    background-size: 200% auto;
 }
 
 .cashout-btn:hover {
     background: #1a75e0;
     transform: translateY(-2px);
+
 }
 
 .reset-btn {
