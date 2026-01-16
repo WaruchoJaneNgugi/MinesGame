@@ -134,7 +134,7 @@ const MinesGame: React.FC = () => {
                 const safeCells = (GRID_SIZE * GRID_SIZE) - bombsCount;
                 const risk = newRevealed / safeCells;
 
-                const baseMultiplier = prev.level === 'easy' ? 1.2 : prev.level === 'medium' ? 1.5 : 2.0;
+                const baseMultiplier = prev.level === 'easy' ? 1.10 : prev.level === 'medium' ? 1.25 : 1.50;
                 newMultiplier = Number((baseMultiplier * (1 + risk)).toFixed(2));
                 playSound('cellSelectSnd');
 
