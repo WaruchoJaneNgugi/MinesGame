@@ -7,7 +7,7 @@ interface GameControlsProps {
     onCashOut: () => void;
     onReset: () => void;
     onChangeLevel: (level: 'easy' | 'medium' | 'hard') => void;
-    onChangeBet: (amount: number) => void;
+    onChangeBet: (points: number) => void;
     onAdjustBet: (increment: boolean) => void;
 }
 
@@ -20,21 +20,22 @@ const GameControls: React.FC<GameControlsProps> = ({
                                                        onChangeBet,
                                                        onAdjustBet
                                                    }) => {
-    const betAmounts = [10, 50, 100,250, 500];
+    const betPoints = [10, 50, 100, 250, 500];
+
     return (
         <div className="game-controls">
             <div className="control-section">
-                <div className="section-title">Bet Amount</div>
+                <div className="section-title">Bet Points</div>
                 <div className="main-bet-amounts">
                     <div className="bet-amount-selector">
-                        {betAmounts.map(amount => (
+                        {betPoints.map(points => (
                             <div
-                                key={amount}
-                                className={`bet-amount-btn ${gameState.betAmount === amount ? 'active' : ''}`}
-                                onClick={() => onChangeBet(amount)}
-                                title={`Bet $${amount}`}
+                                key={points}
+                                className={`bet-amount-btn ${gameState.betPoints === points ? 'active' : ''}`}
+                                onClick={() => onChangeBet(points)}
+                                title={`Bet ${points} pts`}
                             >
-                                {amount}
+                                {points}
                             </div>
                         ))}
                     </div>
@@ -46,7 +47,7 @@ const GameControls: React.FC<GameControlsProps> = ({
                         >
                             -
                         </div>
-                        <div className="current-bet">{gameState.betAmount}</div>
+                        <div className="current-bet">{gameState.betPoints}</div>
                         <div
                             className="bet-adjust-btn"
                             onClick={() => onAdjustBet(true)}
@@ -99,7 +100,7 @@ const GameControls: React.FC<GameControlsProps> = ({
                             className="action-btn cashout-btn"
                             onClick={onCashOut}
                         >
-                            CASH OUT Ksh{(gameState.betAmount * gameState.multiplier).toFixed(2)}
+                            CASH OUT {(gameState.betPoints * gameState.multiplier).toFixed(1)} pts
                         </div>
                     ),
                     win: (
@@ -129,7 +130,7 @@ const GameControls: React.FC<GameControlsProps> = ({
 
             {gameState.gameStatus === 'win' && (
                 <div className="win-message">
-                    Congratulations! You won ksh{gameState.totalWinnings.toFixed(2)}
+                    Congratulations! You won {gameState.totalWinnings} pts
                 </div>
             )}
         </div>

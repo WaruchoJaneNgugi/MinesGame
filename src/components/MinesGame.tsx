@@ -8,29 +8,32 @@ import {useAudioControl} from "../Hooks/useSound.ts";
 
 const GRID_SIZE = 5;
 
-const INITIAL_STATE: GameState = {
-    board: [],
-    bombs: 3,
-    revealed: 0,
-    gameStatus: 'idle',
-    level: 'easy',
-    betAmount: 10,
-    multiplier: 1.00,
-    totalWinnings: 0,
-    balance: 1000 // Changed from 960 to 1000
-};
 
 const MinesGame: React.FC = () => {
+
+    const INITIAL_STATE: GameState = {
+        board: [],
+        bombs: 3,
+        revealed: 0,
+        gameStatus: 'idle',
+        level: 'medium',
+        betPoints: 10,
+        multiplier: 1.00,
+        totalWinnings: 0,
+        points: 200
+    };
     const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
     const [showAllCells, setShowAllCells] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const {playSound}=useAudioControl(isMuted,true);
+
+
     const getBombsCount = useCallback((level: string): number => {
         switch (level) {
             case 'easy':
-                return 3;
+                return 4;
             case 'medium':
-                return 5;
+                return 6;
             case 'hard':
                 return 8;
             default:
@@ -70,7 +73,7 @@ const MinesGame: React.FC = () => {
     }, [gameState.level, getBombsCount]);
 
     const startGame = useCallback(() => {
-        if (gameState.balance < gameState.betAmount) return;
+        if (gameState.points < gameState.betPoints) return;
 
         const newBoard = initializeBoard();
 
@@ -81,12 +84,12 @@ const MinesGame: React.FC = () => {
             revealed: 0,
             multiplier: 1.00,
             totalWinnings: 0,
-            balance: prev.balance - prev.betAmount // Deduct bet amount from balance
+            points: prev.points - prev.betPoints // Deduct bet points from points
         }));
 
         setShowAllCells(false);
         playSound('betClickSnd');
-    }, [gameState.balance, gameState.betAmount, initializeBoard, playSound]);
+    }, [gameState.points, gameState.betPoints, initializeBoard, playSound]);
 
     const resetToIdleState = useCallback(() => {
         const newBoard = initializeBoard();
@@ -115,7 +118,7 @@ const MinesGame: React.FC = () => {
             let newGameStatus = prev.gameStatus;
             let newMultiplier = prev.multiplier;
             let newTotalWinnings = prev.totalWinnings;
-            let newBalance = prev.balance;
+            let newPoints = prev.points;
 
             if (cell.isBomb) {
                 newGameStatus = 'lose';
@@ -134,10 +137,11 @@ const MinesGame: React.FC = () => {
                 const baseMultiplier = prev.level === 'easy' ? 1.2 : prev.level === 'medium' ? 1.5 : 2.0;
                 newMultiplier = Number((baseMultiplier * (1 + risk)).toFixed(2));
                 playSound('cellSelectSnd');
+
                 if (newRevealed === safeCells) {
                     newGameStatus = 'win';
-                    newTotalWinnings = prev.betAmount * newMultiplier;
-                    newBalance = prev.balance + newTotalWinnings;
+                    newTotalWinnings = prev.betPoints * newMultiplier;
+                    newPoints = prev.points + newTotalWinnings;
 
                     setShowAllCells(true);
 
@@ -154,7 +158,7 @@ const MinesGame: React.FC = () => {
                 gameStatus: newGameStatus,
                 multiplier: newMultiplier,
                 totalWinnings: newTotalWinnings,
-                balance: newBalance
+                points: newPoints
             };
         });
     }, [gameState.gameStatus, showAllCells, playSound, resetToIdleState, getBombsCount]);
@@ -162,7 +166,7 @@ const MinesGame: React.FC = () => {
     const cashOut = useCallback(() => {
         if (gameState.gameStatus !== 'playing' || gameState.revealed === 0) return;
 
-        const winnings = gameState.betAmount * gameState.multiplier;
+        const winnings = gameState.betPoints * gameState.multiplier;
 
         setShowAllCells(true);
         playSound('cashOutClickSnd');
@@ -176,13 +180,13 @@ const MinesGame: React.FC = () => {
                     revealed: 0,
                     multiplier: 1.00,
                     totalWinnings: winnings,
-                    balance: prev.balance + winnings
+                    points: prev.points + winnings
                 };
             });
             setShowAllCells(false);
         }, 2000);
 
-    }, [gameState.gameStatus, gameState.revealed, gameState.betAmount, gameState.multiplier, playSound, initializeBoard]);
+    }, [gameState.gameStatus, gameState.revealed, gameState.betPoints, gameState.multiplier, playSound, initializeBoard]);
 
     const changeLevel = useCallback((level: 'easy' | 'medium' | 'hard') => {
         setGameState(prev => {
@@ -199,28 +203,28 @@ const MinesGame: React.FC = () => {
         playSound('betClickSnd');
     }, [getBombsCount, initializeBoard, playSound]);
 
-    const changeBetAmount = useCallback((amount: number) => {
+    const changeBetPoints = useCallback((points: number) => {
         setGameState(prev => ({
             ...prev,
-            betAmount: amount
+            betPoints: points
         }));
         playSound('betClickSnd');
     }, [playSound]);
 
-    const adjustBetAmount = useCallback((increment: boolean) => {
+    const adjustBetPoints = useCallback((increment: boolean) => {
         setGameState(prev => {
-            const currentBet = prev.betAmount;
-            let newBetAmount;
+            const currentBet = prev.betPoints;
+            let newBetPoints;
 
             if (increment) {
-                newBetAmount = currentBet + 10;
+                newBetPoints = currentBet + 10;
             } else {
-                newBetAmount = Math.max(10, currentBet - 10); // Minimum bet is 10
+                newBetPoints = Math.max(10, currentBet - 10); // Minimum bet is 10
             }
 
             return {
                 ...prev,
-                betAmount: newBetAmount
+                betPoints: newBetPoints
             };
         });
         playSound('betClickSnd');
@@ -240,7 +244,7 @@ const MinesGame: React.FC = () => {
     return (
         <div className="mines-game">
             <GameHeader
-                balance={gameState.balance}
+                points={gameState.points}
                 onMuteToggle={() => setIsMuted(!isMuted)}
                 isMuted={isMuted}
             />
@@ -253,15 +257,15 @@ const MinesGame: React.FC = () => {
                     showAllCells={showAllCells}
                 />
             </div>
-                <GameControls
-                    gameState={gameState}
-                    onStart={startGame}
-                    onCashOut={cashOut}
-                    onReset={resetGame}
-                    onChangeLevel={changeLevel}
-                    onChangeBet={changeBetAmount}
-                    onAdjustBet={adjustBetAmount}
-                />
+            <GameControls
+                gameState={gameState}
+                onStart={startGame}
+                onCashOut={cashOut}
+                onReset={resetGame}
+                onChangeLevel={changeLevel}
+                onChangeBet={changeBetPoints}
+                onAdjustBet={adjustBetPoints}
+            />
         </div>
     );
 };

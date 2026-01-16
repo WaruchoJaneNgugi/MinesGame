@@ -4,10 +4,10 @@ export interface GameState {
     revealed: number;
     gameStatus: 'idle' | 'playing' | 'win' | 'lose';
     level: 'easy' | 'medium' | 'hard';
-    betAmount: number;
+    betPoints: number;
     multiplier: number;
     totalWinnings: number;
-    balance: number;
+    points: number;
 }
 
 export interface Cell {

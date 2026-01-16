@@ -1,8 +1,8 @@
 // src/components/SettingsOverlay.tsx
 import  {type FC, useState} from 'react';
-import { X, Book, History, Volume2, VolumeX } from 'lucide-react';
+import { X, Book, Volume2, VolumeX } from 'lucide-react';
 import {HowToPlay} from "./HowToPlay.tsx";
-import {BetHistory} from "./BetHistory.tsx";
+// import {BetHistory} from "./BetHistory.tsx";
 import {AudioSettings} from "./AudioSettings.tsx";
 
 interface SettingsOverlayProps {
@@ -36,13 +36,13 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = ({ onClose,isMuted,onMu
                         <Book size={16} />
                         How to Play
                     </button>
-                    <button
-                        className={`tab-btn ${activeTab === 'bet-history' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('bet-history')}
-                    >
-                        <History size={16} />
-                        Bet History
-                    </button>
+                    {/*<button*/}
+                    {/*    className={`tab-btn ${activeTab === 'bet-history' ? 'active' : ''}`}*/}
+                    {/*    onClick={() => setActiveTab('bet-history')}*/}
+                    {/*>*/}
+                    {/*    <History size={16} />*/}
+                    {/*    Bet History*/}
+                    {/*</button>*/}
                     <button
                         className={`tab-btn ${activeTab === 'audio' ? 'active' : ''}`}
                         onClick={() => setActiveTab('audio')}
@@ -55,7 +55,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = ({ onClose,isMuted,onMu
                 {/* Content Area */}
                 <div className="settings-content">
                     {activeTab === 'how-to-play' && <HowToPlay />}
-                    {activeTab === 'bet-history' && <BetHistory />}
+                    {/*{activeTab === 'bet-history' && <BetHistory />}*/}
                     {activeTab === 'audio' && (
                         <AudioSettings
                             isMuted={isMuted}
