@@ -20,7 +20,7 @@ const GameHeader: FC<GameHeaderProps> = ({ points, onMuteToggle, isMuted }) => {
 
                 {/* Center: Balance */}
                 <div className="balance-section">
-                    <span className="balance-label">POINTS :</span>
+                    <span className="balance-label">Balance :</span>
                     <span className="balance-amount">{points.toFixed(1)}</span>
                 </div>
 

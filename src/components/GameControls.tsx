@@ -25,7 +25,7 @@ const GameControls: React.FC<GameControlsProps> = ({
     return (
         <div className="game-controls">
             <div className="control-section">
-                <div className="section-title">Bet Points</div>
+                <div className="section-title">Bet Amount</div>
                 <div className="main-bet-amounts">
                     <div className="bet-amount-selector">
                         {betPoints.map(points => (
